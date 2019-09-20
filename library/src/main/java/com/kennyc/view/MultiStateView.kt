@@ -80,9 +80,9 @@ class MultiStateView
       
       val noDepartmentViewResId = a.getResourceId(R.styleable.MultiStateView_msv_noDepartmentView, -1)
         if (noDepartmentViewResId > -1) {
-            val inflatedErrorView = inflater.inflate(errorViewResId, this, false)
-            errorView = inflatedErrorView
-            addView(inflatedErrorView, inflatedErrorView.layoutParams)
+            val inflatedNoDepartmentView = inflater.inflate(noDepartmentViewResId, this, false)
+            noDepartmentView = inflatedNoDepartmentView
+            addView(inflatedNoDepartmentView, inflatedNoDepartmentView.layoutParams)
         }
 
         viewState = when (a.getInt(R.styleable.MultiStateView_msv_viewState, VIEW_STATE_CONTENT)) {
@@ -265,6 +265,7 @@ class MultiStateView
                     contentView?.visibility = View.GONE
                     errorView?.visibility = View.GONE
                     loadingView?.visibility = View.GONE
+                   noDepartmentView?.visibility = View.GONE
 
                     if (animateLayoutChanges) {
                         animateLayoutChange(getView(previousState))
