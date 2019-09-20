@@ -24,6 +24,7 @@ class MultiStateView
         CONTENT,
         LOADING,
         ERROR,
+        NO_DEPARTMENT,
         EMPTY
     }
 
@@ -34,6 +35,8 @@ class MultiStateView
     private var errorView: View? = null
 
     private var emptyView: View? = null
+  
+  private var noDepartmentView: View? = null
 
     var listener: StateListener? = null
 
@@ -74,11 +77,19 @@ class MultiStateView
             errorView = inflatedErrorView
             addView(inflatedErrorView, inflatedErrorView.layoutParams)
         }
+      
+      val noDepartmentViewResId = a.getResourceId(R.styleable.MultiStateView_msv_noDepartmentView, -1)
+        if (noDepartmentViewResId > -1) {
+            val inflatedErrorView = inflater.inflate(errorViewResId, this, false)
+            errorView = inflatedErrorView
+            addView(inflatedErrorView, inflatedErrorView.layoutParams)
+        }
 
         viewState = when (a.getInt(R.styleable.MultiStateView_msv_viewState, VIEW_STATE_CONTENT)) {
             VIEW_STATE_ERROR -> ViewState.ERROR
             VIEW_STATE_EMPTY -> ViewState.EMPTY
             VIEW_STATE_LOADING -> ViewState.LOADING
+            VIEW_STATE_NO_DEPARTMENT -> ViewState.NO_DEPARTMENT
             else -> ViewState.CONTENT
         }
         animateLayoutChanges = a.getBoolean(R.styleable.MultiStateView_msv_animateViewChanges, false)
@@ -98,6 +109,7 @@ class MultiStateView
             ViewState.CONTENT -> contentView
             ViewState.EMPTY -> emptyView
             ViewState.ERROR -> errorView
+            ViewState.NO_DEPARTMENT -> noDepartmentView
         }
     }
 
@@ -130,6 +142,12 @@ class MultiStateView
 
             ViewState.CONTENT -> {
                 if (contentView != null) removeView(contentView)
+                contentView = view
+                addView(view)
+            }
+          
+          ViewState.NO_DEPARTMENT -> {
+                if (noDepartmentView != null) removeView(noDepartmentView)
                 contentView = view
                 addView(view)
             }
@@ -219,7 +237,7 @@ class MultiStateView
     private fun isValidContentView(view: View): Boolean {
         return if (contentView != null && contentView !== view) {
             false
-        } else view != loadingView && view != errorView && view != emptyView
+        } else view != loadingView && view != errorView && view != emptyView && view != noDepartmentView
     }
 
     /**
@@ -232,6 +250,7 @@ class MultiStateView
                     contentView?.visibility = View.GONE
                     errorView?.visibility = View.GONE
                     emptyView?.visibility = View.GONE
+                  noDepartmentView?.visibility = View.GONE
 
                     if (animateLayoutChanges) {
                         animateLayoutChange(getView(previousState))
@@ -260,6 +279,22 @@ class MultiStateView
                     contentView?.visibility = View.GONE
                     loadingView?.visibility = View.GONE
                     emptyView?.visibility = View.GONE
+                  noDepartmentView?.visibility = View.GONE
+
+                    if (animateLayoutChanges) {
+                        animateLayoutChange(getView(previousState))
+                    } else {
+                        visibility = View.VISIBLE
+                    }
+                }
+            }
+          
+            ViewState.NO_DEPARTMENT -> {
+                requireNotNull(noDepartmentView).apply {
+                    contentView?.visibility = View.GONE
+                    loadingView?.visibility = View.GONE
+                    emptyView?.visibility = View.GONE
+                  errorView?.visibility = View.GONE
 
                     if (animateLayoutChanges) {
                         animateLayoutChange(getView(previousState))
@@ -274,6 +309,7 @@ class MultiStateView
                     loadingView?.visibility = View.GONE
                     errorView?.visibility = View.GONE
                     emptyView?.visibility = View.GONE
+                  noDepartmentView?.visibility = View.GONE
 
                     if (animateLayoutChanges) {
                         animateLayoutChange(getView(previousState))
@@ -357,3 +393,4 @@ private const val VIEW_STATE_CONTENT = 0
 private const val VIEW_STATE_ERROR = 1
 private const val VIEW_STATE_EMPTY = 2
 private const val VIEW_STATE_LOADING = 3
+private const val VIEW_STATE_NO_DEPARTMENT = 4
